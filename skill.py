@@ -41,7 +41,6 @@ HASS_GROUP_ON_SVC = "/api/services/homeassistant/turn_on"
 HASS_GROUP_OFF_SVC = "/api/services/homeassistant/turn_off"
 HASS_AUTOMATION_ON_SVC = "/api/services/automation/turn_on"
 HASS_AUTOMATION_OFF_SVC = "/api/services/automation/turn_off"
-SKILL_ID = "s710-lightsha"
 
 # -----------------------------------------------------------------------------
 # class App
@@ -55,7 +54,6 @@ class Skill(hss.BaseSkill):
     def __init__(self):
         super().__init__()
 
-        self.logger = logging.getLogger(SKILL_ID)
         self.enable_confirmation = False
 
         self.my_intents = ['s710:keepLightOn', 's710:turnOnLight', 's710:keepLightOff', 's710:turnOffLight', 's710:enableAutomatic', 's710:enableAutomaticOff']
@@ -102,6 +100,9 @@ class Skill(hss.BaseSkill):
         room_id = slots["room_id"] if "room_id" in slots else None
         lamp_id = slots["lamp_id"] if "lamp_id" in slots else None
         brightness = slots["brightness"] if "brightness" in slots else None
+
+        if room_id:
+            room_id = room_id.lower().replace('ä', 'ae').replace('ü','ue').replace('ö', 'oe')
 
         # get corresponding home assistant service-url + payload
 
