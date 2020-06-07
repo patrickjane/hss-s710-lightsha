@@ -89,14 +89,14 @@ class Skill(hss.BaseSkill):
     # get_intentlist (overwrites BaseSkill.get_intentlist)
     # --------------------------------------------------------------------------
 
-    def get_intentlist(self):
+    async def get_intentlist(self):
         return self.my_intents
 
     # --------------------------------------------------------------------------
     # handle (overwrites BaseSkill.handle)
     # --------------------------------------------------------------------------
 
-    def handle(self, request, session_id, site_id, intent_name, slots):
+    async def handle(self, request, session_id, site_id, intent_name, slots):
         room_id = slots["room_id"] if "room_id" in slots else None
         lamp_id = slots["lamp_id"] if "lamp_id" in slots else None
         brightness = slots["brightness"] if "brightness" in slots else None
@@ -110,7 +110,7 @@ class Skill(hss.BaseSkill):
 
         if not service or not data:
             self.log.error("Service/service data could not be determined")
-            return self.done(session_id, site_id, intent_name, "Aktion konnte nicht durchgeführt werden", "de_DE")
+            return self.answer(session_id, site_id, "Aktion konnte nicht durchgeführt werden", "de_DE")
 
         # fire the service using HA REST API
 
@@ -120,7 +120,7 @@ class Skill(hss.BaseSkill):
         r = requests.post(self.hass_host + service, json = data, headers = self.hass_headers)
 
         if r.status_code != 200:
-            return self.done(session_id, site_id, intent_name, "Aktion konnte nicht durchgeführt werden", "de_DE")
+            return self.answer(session_id, site_id, "Aktion konnte nicht durchgeführt werden", "de_DE")
 
         # second additional service? (keep light on = disable automation + turn on light)
 
@@ -146,7 +146,7 @@ class Skill(hss.BaseSkill):
         elif self.enable_confirmation:
             response_message = self.confirmation_failure
 
-        return self.done(session_id, site_id, intent_name, response_message, "de_DE")
+        return self.answer(session_id, site_id, response_message, "de_DE")
 
     # -------------------------------------------------------------------------
     # params_of
